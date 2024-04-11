@@ -1,4 +1,4 @@
-#HarmonyHub
+# HarmonyHub
 
 ### Things to add
 Spotify O-Auth Workflow Diagram
