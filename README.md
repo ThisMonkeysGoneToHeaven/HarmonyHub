@@ -1,6 +1,6 @@
 # HarmonyHub
 
 ### Things to add
-Spotify O-Auth Workflow Diagram
-Class Diagrams for the backend models
-Session Management for HH
+Spotify O-Auth Workflow Diagram <br>
+Class Diagrams for the backend models <br>
+Session Management for HH <br>
