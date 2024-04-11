@@ -11,4 +11,5 @@ router.get('/callback', spotifyController.handleCallback);
 router.get('/disconnect', authenticateUser, makeSureSpotifyIsConnected, spotifyController.disconnectSpotify);
 router.get('/topArtists', authenticateUser, makeSureSpotifyIsConnected, spotifyController.getTopArtists);
 
+
 module.exports = router;

@@ -21,8 +21,16 @@ const userSchema = new mongoose.Schema({
                 type: String,
                 required: this.isSpotifyConnected ? true : undefined
             },
-            refersh_token:{
+            refresh_token:{
                 type: String,
+                required: this.isSpotifyConnected ? true : undefined
+            },
+            expires_in:{
+                type: Number,
+                required: this.isSpotifyConnected ? true : undefined
+            },
+            expiry_time:{
+                type: Number,
                 required: this.isSpotifyConnected ? true : undefined
             }
         },

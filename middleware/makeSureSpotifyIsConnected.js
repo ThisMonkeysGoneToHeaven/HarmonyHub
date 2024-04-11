@@ -14,7 +14,7 @@ async function makeSureSpotifyIsConnected(req, res, next){
         const user = await User.findOne({email: req.user.userId});
         
         if(user.isSpotifyConnected === false)
-            return handleErrorMessages(res, '', `Cannot disconnect spotify account from HarmonyHub because it isn't connected in the first place`, 409);
+            return handleErrorMessages(res, '', `Spotify account isn't connected to Harmony Hub`, 409);
             else
                 next();
     }
