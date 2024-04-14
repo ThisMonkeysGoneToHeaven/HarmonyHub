@@ -1,4 +1,4 @@
-import loginUser from "../features/loginUser.mjs";
+import {loginUser} from "../controllers/authController.mjs";
 import showMessage from "../utils/showMessage.mjs";
 
 document.addEventListener("DOMContentLoaded", function(){
@@ -23,7 +23,7 @@ document.addEventListener("DOMContentLoaded", function(){
                     sessionStorage.setItem("token", response.token);
                     sessionStorage.setItem("user_id", email);
                     // redirect to dashboard - the path here is relative to index.html and not this .js file
-                    window.location.href = './dashboard.html';
+                    window.location.href = '../../../frontend/dashboard.html';
                 }
                 else
                     showMessage('Login failed. Please check your credentials.', 'error');
