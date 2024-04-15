@@ -35,4 +35,8 @@ document.addEventListener("DOMContentLoaded", function(){
         }        
 
     });
+
+    document.getElementById('forgotPassword').addEventListener('click', function(){
+        window.location.href = '../../../frontend/forgotPassword.html';
+    });
 });

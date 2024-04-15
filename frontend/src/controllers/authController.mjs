@@ -53,3 +53,28 @@ export async function logoutUser(){
         }
     });
 }
+
+export async function verifyCaptcha(token){
+
+    const apiUrl = `http://localhost:3000/auth/verifyCaptcha`;
+
+    const requestOptions = {
+        method: "POST",
+        uri: apiUrl,
+        json: true,
+        headers:{
+            'Content-Type':'application/json'
+        },
+        body: JSON.stringify({token})
+    };
+
+    return fetch(apiUrl, requestOptions)
+    .then(response => {
+        if(response.ok){
+            console.log(response);
+        }
+        else{
+            console.log(response);
+        }
+    });
+}

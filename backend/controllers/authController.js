@@ -106,7 +106,6 @@ async function login(req, res){
 
 async function logout(req, res){
     try{
-
         const {userId} = req.user;
         await Session.deleteMany({userId});
         return res.status(201).json({message: 'Logout Successfull !'});
@@ -116,4 +115,29 @@ async function logout(req, res){
     }
 }
 
-module.exports = {register, login, logout};
+async function verifyCaptcha(req, res){
+        const {token} = req.body;
+        const apiUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`;
+
+        const authOptions = {
+            method: 'POST',
+            headers:{
+                'Content-Type':'application/json',
+            }
+        }
+
+        fetch(apiUrl, authOptions)
+        .then(response => response.json())
+        .then(data => {
+            
+            if('error-codes' in data)
+                throw new Error(data['error-codes']);
+            
+            return data.success;
+        })
+        .catch(error => {
+            return handleErrorMessages(res, 'Error during verifying captcha', error, 500);
+        });
+}
+
+module.exports = {register, login, logout, verifyCaptcha};
