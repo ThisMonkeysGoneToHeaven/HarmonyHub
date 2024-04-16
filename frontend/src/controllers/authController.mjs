@@ -21,7 +21,7 @@ export async function loginUser(email, password){
         .then(data => {
             return data;
         })
-        .catch(error => console.log(error));
+        .catch(error => console.error(error));
 }
 
 export async function logoutUser(){
@@ -54,6 +54,17 @@ export async function logoutUser(){
     });
 }
 
+export async function forgotPassword(email){
+    const apiUrl = `http://localhost:3000/auth/forgotPassword`;
+    const requestOptions = {
+        method: 'POST',
+        body: JSON.stringify({email})
+    }
+
+    // return fetch(apiUrl, requestOptions)
+    // .then();
+}
+
 export async function verifyCaptcha(token){
 
     const apiUrl = `http://localhost:3000/auth/verifyCaptcha`;
@@ -69,12 +80,7 @@ export async function verifyCaptcha(token){
     };
 
     return fetch(apiUrl, requestOptions)
-    .then(response => {
-        if(response.ok){
-            console.log(response);
-        }
-        else{
-            console.log(response);
-        }
-    });
+    .then(response => response.json())
+    .then(data => data.captcha_success)
+    .catch(error => console.error(error));
 }

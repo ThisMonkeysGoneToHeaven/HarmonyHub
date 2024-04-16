@@ -1,5 +1,5 @@
 import showMessage from '../utils/showMessage.mjs';
-import {verifyCaptcha} from '../controllers/authController.mjs';
+import {verifyCaptcha, forgotPassword} from '../controllers/authController.mjs';
 
 document.addEventListener('DOMContentLoaded', function(){
 
@@ -38,16 +38,19 @@ document.addEventListener('DOMContentLoaded', function(){
                     return;
                 }
 
-                if(isCaptchaValid){
-                    // start the forgot password proceess -> send the email to the forgotPassword function to be made in the auth/userController
-
-                    // if everything goes right, we'll show a mssg saying that a reset link has been sent to your email, if it exists in our database
-                    // otherwise, there was an error during reset password process
+                if(!isCaptchaValid){
+                    showMessage('captcha failed - suspicious activity detected, pls try again later!');
+                    return;
                 }
-                else{
-                    // captcha failed - suspicious activity
-                }             
+
+                console.log('captcha valid!');
             });
+        });
+
+        forgotPassword(email)
+        .then(response => {
+            // success, reset link sent to your email if it exists in our db
+            // failure, something went wrong nigga
         });
 
     });

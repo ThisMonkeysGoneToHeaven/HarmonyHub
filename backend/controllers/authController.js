@@ -98,9 +98,8 @@ async function login(req, res){
         await session.save();
         return res.json({token, message: doTheyHaveAnExistingActiveSession ? 'Your previously active session has been terminated. You are logged in here now!' : 'You are logged in.'});
     }
-    catch(error){
-        // console.error(error);
-        return res.status(500).json({ error: 'An error occurred while logging in: ' + error });    
+    catch(error){     
+        return handleErrorMessages(res, 'an error occured while logging in ', error, 500);    
     }
 }
 
@@ -126,18 +125,30 @@ async function verifyCaptcha(req, res){
             }
         }
 
-        fetch(apiUrl, authOptions)
+        return fetch(apiUrl, authOptions)
         .then(response => response.json())
         .then(data => {
             
             if('error-codes' in data)
                 throw new Error(data['error-codes']);
-            
-            return data.success;
+            return res.status(200).json({captcha_success : data.success});
         })
         .catch(error => {
             return handleErrorMessages(res, 'Error during verifying captcha', error, 500);
         });
 }
 
-module.exports = {register, login, logout, verifyCaptcha};
+async function forgotPassword(req, res){
+
+    const {email} = req.body;
+    
+    // check if this email exists in the db or not
+    // if it does not exist, send a positive response
+    
+    /* when the email does exist
+        prepare a reset password link    
+        send an email
+    */
+}
+
+module.exports = {register, login, logout, verifyCaptcha, forgotPassword};
