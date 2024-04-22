@@ -1,5 +1,6 @@
 import {loginUser} from "../controllers/authController.mjs";
 import showMessage from "../utils/showMessage.mjs";
+import {isEmailValid, isPasswordValid} from '../utils/basicValidation.mjs';
 
 document.addEventListener("DOMContentLoaded", function(){
 
@@ -10,8 +11,8 @@ document.addEventListener("DOMContentLoaded", function(){
         const password = document.getElementById("password").value;
         
         // basic validation
-        if (!email || !password) {
-            showMessage("Please fill in both email and password fields.", "error");
+        if(!isEmailValid(email) || !isPasswordValid(password)){
+            showMessage("Please enter valid email and password!");
             return;
         }
         

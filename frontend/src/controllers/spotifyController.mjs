@@ -1,7 +1,8 @@
 import showMessage from "../utils/showMessage.mjs";
+import {backendServerBaseURL} from '../utils/constants.mjs'
 
 const connectSpotify = async () => {
-    const apiUrl = 'http://localhost:3000/api/spotify/connect';
+    const apiUrl = `${backendServerBaseURL}/api/spotify/connect`;
     const token = sessionStorage.getItem('token');
 
     const requestOptions = {
@@ -29,7 +30,7 @@ const connectSpotify = async () => {
 
 const disconnectSpotify = async () => {
         
-    const apiUrl = 'http://localhost:3000/api/spotify/disconnect';
+    const apiUrl = `${backendServerBaseURL}/api/spotify/disconnect`;
     const token = sessionStorage.getItem('token');
 
     const requestOptions = {
@@ -61,7 +62,7 @@ const disconnectSpotify = async () => {
 
 const fetchUsersTopArtists = async (token) => {
 
-    const apiUrl = `http://localhost:3000/api/spotify/topArtists`;
+    const apiUrl = `${backendServerBaseURL}/api/spotify/topArtists`;
     const requestOptions = {
         method: "GET",
         uri: apiUrl,

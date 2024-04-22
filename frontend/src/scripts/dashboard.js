@@ -16,7 +16,7 @@ document.addEventListener("DOMContentLoaded", function(){
          fetchUserData(userId, token)
         .then(async response => {
 
-            if(response.email){
+            if(response && response.email){
 
                 const nameSpan = document.getElementById('username');
                 nameSpan.innerHTML = `${response.username}`;

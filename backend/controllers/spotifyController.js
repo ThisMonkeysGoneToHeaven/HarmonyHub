@@ -2,12 +2,9 @@ const querystring = require('querystring');
 const User = require('../models/User');
 const request = require('request-promise');
 const axios = require('axios');
+const handleErrorMessages = require('../utils/errorHandler');
 
-function handleErrorMessages(res, error, error_mssg, error_code){
-    error_log = './controllers/spotifyController.js --- ' + error_mssg;
-    console.error(error_log + (error !== '' ? ` : ${error}` : ''));
-    return res.status(error_code).json({error: error_mssg});
-}
+const filePathAndName = 'backend/controllers/spotifyController.js';
 
 const initiateSpotifyAuthorization = async function(req, res){
 
@@ -61,7 +58,7 @@ const handleCallback = async function(req, res){
     .then(async data => {
 
         if(data.access_token === undefined)
-            throw new Error('access_token is undefined !_!');
+            throw new Error('access_token is undefined!');
         
         // save access_token and refresh_token in the user's SpotifyData
         const userId = req.query.state;
@@ -80,13 +77,11 @@ const handleCallback = async function(req, res){
         return res.status(200).redirect(process.env.USERS_DASHBOARD_URI);
     })
     .catch(error => {
-        return handleErrorMessages(res, error, 'error retrieving spotify tokens', 500);
+        return handleErrorMessages(res, 'Error retrieving spotify tokens', error, 500, filePathAndName);
     });
 }
 
 const requestNewTokens = async function(req, res, refresh_token){
-
-    console.log('requesting new tokens!'); // dev log delete
 
     try{
         const apiUrl = "https://accounts.spotify.com/api/token";
@@ -111,7 +106,7 @@ const requestNewTokens = async function(req, res, refresh_token){
         return {newAccessToken: newUserDataResponse.access_token, newRefreshToken: newUserDataResponse.refresh_token || refresh_token};
     }
     catch(error){
-        return handleErrorMessages(res, error, 'an error occurred while fetching tokens', 500);
+        return handleErrorMessages(res, 'An error occured while fetching tokens!', error, 500, filePathAndName);
     }
 }
 
@@ -119,8 +114,6 @@ const getSpotifyAccessToken = async function(req, res, userId){
     try{
         const userData = await User.findOne({email: userId});
         const currentAccessToken = userData.spotifyData.access_token;
-        
-
 
         // check if the access token is valid  
         if(Date.now() <= userData.spotifyData.expiry_time)
@@ -131,7 +124,7 @@ const getSpotifyAccessToken = async function(req, res, userId){
         const {newAccessToken, newRefreshToken} = await requestNewTokens(req, res, userData.spotifyData.refresh_token);
 
         if(newAccessToken === undefined)
-            throw new Error('an error occured while fetching tokens');
+            throw new Error('An error occured while fetching tokens');
 
         const error_time = ~~(0.05 * userData.spotifyData.expires_in);
         userData.spotifyData = {
@@ -144,7 +137,7 @@ const getSpotifyAccessToken = async function(req, res, userId){
         return newAccessToken;
     }
     catch(error){
-        return handleErrorMessages(res, error, 'an error occurred while fetching tokens', 500);
+        return handleErrorMessages(res, 'An error occured while fetching tokens!', error, 500, filePathAndName);
     }
 }
 
@@ -161,11 +154,12 @@ const disconnectSpotify = async function(req, res){
         return res.status(200).json({message: `successfully deleted your spotify data from HarmonyHub. Pls go ahead and revoke HarmonyHub's access to your spotify account by visiting Manage Apps section in your Spotify account settings.`});
     }
     catch(error){
-        return handleErrorMessages(res, error, 'error disconnecting spotify from HarmonyHub', 500);
+        return handleErrorMessages(res, 'An error occured while disconnecting spotify from HarmonyHub!', error, 500, filePathAndName);
     }
 }
 
 const getTopArtists = async function(req, res){
+
     const apiUrl = `https://api.spotify.com/v1/me/top/artists`;
     const spotifyAccessToken = await getSpotifyAccessToken(req, res, req.user.userId);
     const requestOptions = {
@@ -187,7 +181,7 @@ const getTopArtists = async function(req, res){
             return res.status(200).json(data);
     })
     .catch(error => {
-        return handleErrorMessages(res, error, `Error Fetching User's Top Aritsts`, 500);
+        return handleErrorMessages(res, 'An error occured while fetching user\'s top Artists!', error, 500, filePathAndName);
     });
 }
 

@@ -1,13 +1,9 @@
 import showMessage from '../utils/showMessage.mjs';
-import {verifyCaptcha, forgotPassword} from '../controllers/authController.mjs';
+import {verifyCaptcha} from '../controllers/authController.mjs';
+import { forgotPassword } from '../controllers/userController.mjs';
+import {isEmailValid} from '../utils/basicValidation.mjs';
 
 document.addEventListener('DOMContentLoaded', function(){
-
-    function isEmailValid(email){
-        // this regex checks for the format text@text.com where text is a string of one or more characters, not including an @ or whitespace
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        return emailRegex.test(email);
-    }
     
     //captcha div 
     const recaptchaContainer = document.querySelector('.g-recaptcha');
@@ -50,7 +46,7 @@ document.addEventListener('DOMContentLoaded', function(){
         forgotPassword(email)
         .then(response => {
             // success, reset link sent to your email if it exists in our db
-            // failure, something went wrong nigga
+            // failure, something went wrong
         });
 
     });

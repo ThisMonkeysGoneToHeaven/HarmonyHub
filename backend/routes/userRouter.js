@@ -3,7 +3,9 @@ const router = express.Router();
 const userController = require('../controllers/userController');
 const authenticateUser = require('../middleware/authenticateUser')
 
-// middleware 'authenticateUser' utilised here
+router.post('/forgotPassword', userController.forgotPassword);
+router.post('/resetPassword', userController.resetPassword);
 router.get('/:userId', authenticateUser, userController.getUserDetails);
+
 
 module.exports = router;

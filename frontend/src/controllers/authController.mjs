@@ -1,7 +1,8 @@
 import showMessage from "../utils/showMessage.mjs";
+import {backendServerBaseURL} from '../utils/constants.mjs'
 
 export async function loginUser(email, password){
-    const apiUrl = "http://localhost:3000/auth/login";
+    const apiUrl = `${backendServerBaseURL}/auth/login`;
     const requestOptions = {
         method: "POST",
         uri: apiUrl,
@@ -25,7 +26,7 @@ export async function loginUser(email, password){
 }
 
 export async function logoutUser(){
-    const apiUrl = `http://localhost:3000/auth/logout`;
+    const apiUrl = `${backendServerBaseURL}/auth/logout`;
     const token = sessionStorage.getItem('token');
     const requestOptions = {
         method: "POST",
@@ -54,20 +55,9 @@ export async function logoutUser(){
     });
 }
 
-export async function forgotPassword(email){
-    const apiUrl = `http://localhost:3000/auth/forgotPassword`;
-    const requestOptions = {
-        method: 'POST',
-        body: JSON.stringify({email})
-    }
-
-    // return fetch(apiUrl, requestOptions)
-    // .then();
-}
-
 export async function verifyCaptcha(token){
 
-    const apiUrl = `http://localhost:3000/auth/verifyCaptcha`;
+    const apiUrl = `${backendServerBaseURL}/auth/verifyCaptcha`;
 
     const requestOptions = {
         method: "POST",
