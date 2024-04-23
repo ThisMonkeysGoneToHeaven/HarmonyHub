@@ -1,28 +1,22 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const MyCustomError = require('../utils/MyCustomError');
+const handleErrorMessages = require('../utils/errorHandler');
 
-function handleErrorMessages(res, error, error_mssg, error_code){
-    error_log = './middleware/checkIfSpotifyAlreadyConnected.js --- ' + error_mssg;
-    console.error(error_log + (error !== '' ? ` : ${error}` : ''));
-    return res.status(error_code).json({error: error_mssg});
-}
+const fileNameAndPath = `backend/middleware/checkIfSpotifyAlreadyConnected.js`;
 
 async function checkIfSpotifyAlreadyConnected(req, res, next){
 
-
     try{
-        // check if this user's spotify is already connected?
         const user = await User.findOne({email: req.user.userId});
-
         if(user.isSpotifyConnected === true)
-            throw new Error("User's spotify account is already connected to HarmonyHub.", {code: 409});
+            throw new MyCustomError("User's spotify account is already connected to HarmonyHub.", 409);
+
         next();
     }
     catch(error){
-        if(error.code === 409)
-            return handleErrorMessages(res, error, "User's spotify account is already connected to HarmonyHub.", 409);
-        else
-            return handleErrorMessages(res, error, 'An issue occured while doing checks for the spotify connection!', 500);
+        const processName = `verifying if user's HarmonyHub is already connected to their Spotify`;
+        return handleErrorMessages(res, error, processName, fileNameAndPath);
     }
 }
 

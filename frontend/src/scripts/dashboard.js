@@ -25,7 +25,6 @@ document.addEventListener("DOMContentLoaded", function(){
 
                 if(response.isSpotifyConnected){
                     const spotifyData = document.getElementById('spotifyData');
-                    let spotifyDataHTML = ``;
                     const usersTopArtists = await fetchUsersTopArtists(token);
                     console.log(usersTopArtists);
                     disconnectSpotifyButton.innerHTML = `<button>Disconnect Spotify</button>`;

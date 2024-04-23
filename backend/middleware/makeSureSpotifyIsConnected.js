@@ -1,25 +1,21 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const MyCustomError = require('../utils/MyCustomError');
+const handleErrorMessages = require('../utils/errorHandler');
 
-function handleErrorMessages(res, error, error_mssg, error_code){
-    error_log = './middleware/makeSureSpotifyIsConnected.js --- ' + error_mssg;
-    console.error(error_log + (error !== '' ? ` : ${error}` : ''));
-    return res.status(error_code).json({error: error_mssg});
-}    
+const fileNameAndPath = `backend/middleware/makeSureSpotifyIsConnected.js`;
 
 async function makeSureSpotifyIsConnected(req, res, next){
 
     try{
-        // make sure that this user's spotify is connect to HH
         const user = await User.findOne({email: req.user.userId});
-        
         if(user.isSpotifyConnected === false)
-            return handleErrorMessages(res, '', `Spotify account isn't connected to Harmony Hub`, 409);
-            else
-                next();
+            throw new MyCustomError(`User's Spotify is not connected to their HarmonyHub`, 400);
+        next();
     }
     catch(error){
-        return handleErrorMessages(res, error, 'error while checking if user has their spotify account connected to HH', 401);
+        const processName = `verifying if user's Spotify is connected to their HarmonyHub account.`;
+        return handleErrorMessages(res, error, processName, fileNameAndPath);
     }
 }
 

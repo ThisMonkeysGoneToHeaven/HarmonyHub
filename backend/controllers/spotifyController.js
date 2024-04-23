@@ -1,28 +1,33 @@
-const querystring = require('querystring');
 const User = require('../models/User');
-const request = require('request-promise');
-const axios = require('axios');
+const querystring = require('querystring');
+const MyCustomError = require(`../utils/MyCustomError`);
 const handleErrorMessages = require('../utils/errorHandler');
 
 const filePathAndName = 'backend/controllers/spotifyController.js';
 
 const initiateSpotifyAuthorization = async function(req, res){
 
-    const baseSpotifyAuthURL = 'https://accounts.spotify.com/authorize';
-    const clientId = process.env.SPOTIFY_CLIENT_ID;
-    const redirectURI = process.env.SPOTIFY_REDIRECT_URI;
-    const scope = 'user-read-private user-top-read';
-
-    const finalAuthURL = baseSpotifyAuthURL + '?' + querystring.stringify({
-        response_type: 'code',
-        client_id: clientId,
-        redirect_uri: redirectURI,
-        scope: scope,
-        state: req.user.userId
-    });
-
-    // send it back to the frontend
-    res.send(finalAuthURL);
+    try{
+        const baseSpotifyAuthURL = 'https://accounts.spotify.com/authorize';
+        const clientId = process.env.SPOTIFY_CLIENT_ID;
+        const redirectURI = process.env.SPOTIFY_REDIRECT_URI;
+        const scope = 'user-read-private user-top-read';
+    
+        const finalAuthURL = baseSpotifyAuthURL + '?' + querystring.stringify({
+            response_type: 'code',
+            client_id: clientId,
+            redirect_uri: redirectURI,
+            scope: scope,
+            state: req.user.userId
+        });
+    
+        // send it back to the frontend
+        res.send(finalAuthURL);    
+    }
+    catch(error){
+        const processName = 'initiating Spotify Authorisation!';
+        return handleErrorMessages(res, error, processName, filePathAndName);
+    }
 }
 
 const handleCallback = async function(req, res){
@@ -64,12 +69,11 @@ const handleCallback = async function(req, res){
         const userId = req.query.state;
         const userData = await User.findOne({email: userId});
         userData.isSpotifyConnected = true;
-        const error_time = ~~(0.05 * data.expires_in);
 
         userData.spotifyData = {
             access_token: data.access_token,
             refresh_token: data.refresh_token,
-            expiry_time: Date.now() + (data.expires_in- error_time) * 1000,
+            expiry_time: Date.now() + data.expires_in * 1000,
             expires_in: data.expires_in
         }
 
@@ -77,12 +81,12 @@ const handleCallback = async function(req, res){
         return res.status(200).redirect(process.env.USERS_DASHBOARD_URI);
     })
     .catch(error => {
-        return handleErrorMessages(res, 'Error retrieving spotify tokens', error, 500, filePathAndName);
+        const processName = `completing Spotify authorisation!`;
+        return handleErrorMessages(res, error, processName, filePathAndName);
     });
 }
 
 const requestNewTokens = async function(req, res, refresh_token){
-
     try{
         const apiUrl = "https://accounts.spotify.com/api/token";
         const requestOptions = {
@@ -97,16 +101,14 @@ const requestNewTokens = async function(req, res, refresh_token){
             }),
         }
         
-        const body = await fetch(apiUrl, requestOptions);
-        const newUserDataResponse = await body.json();
+        const newUserDataResponse = await fetch(apiUrl, requestOptions)
+        .then(response => response.json());
 
-        if(newUserDataResponse.error !== undefined)
-            throw new Error('An error occurred while refreshing tokens : ' + newUserDataResponse.error + ' : ' + newUserDataResponse.error_description );
-        
         return {newAccessToken: newUserDataResponse.access_token, newRefreshToken: newUserDataResponse.refresh_token || refresh_token};
     }
     catch(error){
-        return handleErrorMessages(res, 'An error occured while fetching tokens!', error, 500, filePathAndName);
+        const processName = `refreshing tokens!`;
+        return handleErrorMessages(res, error, processName, filePathAndName);
     }
 }
 
@@ -123,21 +125,18 @@ const getSpotifyAccessToken = async function(req, res, userId){
         // otherwise, fetch a new one using the refresh token and return that
         const {newAccessToken, newRefreshToken} = await requestNewTokens(req, res, userData.spotifyData.refresh_token);
 
-        if(newAccessToken === undefined)
-            throw new Error('An error occured while fetching tokens');
-
-        const error_time = ~~(0.05 * userData.spotifyData.expires_in);
         userData.spotifyData = {
             access_token: newAccessToken,
             refresh_token: newRefreshToken,
-            expiry_time: Date.now() + (userData.spotifyData.expires_in - error_time) * 1000,
+            expiry_time: Date.now() + (userData.spotifyData.expires_in  * 1000),
             expires_in: userData.spotifyData.expires_in
         }
         await userData.save();
         return newAccessToken;
     }
     catch(error){
-        return handleErrorMessages(res, 'An error occured while fetching tokens!', error, 500, filePathAndName);
+        const processName = `fetching Spotify token!`;
+        return handleErrorMessages(res, error, processName, filePathAndName);
     }
 }
 
@@ -154,7 +153,8 @@ const disconnectSpotify = async function(req, res){
         return res.status(200).json({message: `successfully deleted your spotify data from HarmonyHub. Pls go ahead and revoke HarmonyHub's access to your spotify account by visiting Manage Apps section in your Spotify account settings.`});
     }
     catch(error){
-        return handleErrorMessages(res, 'An error occured while disconnecting spotify from HarmonyHub!', error, 500, filePathAndName);
+        const processName = `disconnecting Spotify!`;
+        return handleErrorMessages(res, error, processName, filePathAndName);
     }
 }
 
@@ -171,17 +171,14 @@ const getTopArtists = async function(req, res){
             'Authorization': `Bearer ${spotifyAccessToken}`
         }
     }
-
     fetch(apiUrl, requestOptions)
     .then(response => response.json())
     .then(data => {
-        if(data.error)
-            throw new Error(JSON.stringify(data.error));
-        else
-            return res.status(200).json(data);
+        return res.status(200).json(data);
     })
     .catch(error => {
-        return handleErrorMessages(res, 'An error occured while fetching user\'s top Artists!', error, 500, filePathAndName);
+        const processName = `fetching user's top artists!`;
+        return handleErrorMessages(res, error, processName, filePathAndName);
     });
 }
 

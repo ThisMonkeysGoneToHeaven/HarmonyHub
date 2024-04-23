@@ -1,9 +1,10 @@
+const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 const Session = require('../models/Session');
-const jwt = require('jsonwebtoken');
+const MyCustomError = require('../utils/MyCustomError');
 const handleErrorMessages = require('../utils/errorHandler');
-const {isValidEmail, isValidPassword} = require('../utils/basicValidation');
 const {hashPassword, comparePassword} = require('../utils/passwordHash');
+const {isValidEmail, isValidPassword} = require('../utils/basicValidation');
 
 // Import the database connection from db.js
 const db = require('../db'); 
@@ -14,7 +15,7 @@ async function register(req, res){
 
         const {email, password} = req.body;
         if(!isValidEmail(email) || !isValidPassword(password)){
-            return handleErrorMessages(res, 'Registration failed! Invalid Email or Password!', '', 400, filePathAndName);
+            throw new MyCustomError('Registration failed! Invalid Email or Password!', 400);
         }
 
         const hashedPassword = await hashPassword(password);
@@ -25,29 +26,28 @@ async function register(req, res){
     }
     catch(error){
 
-        if(error.code === 11000){
-            if(error.keyPattern.email === 1){
-                return handleErrorMessages(res, 'Email is already registered!', '', 409, filePathAndName);
-            }
+        if(error.code === 11000 && error.keyPattern.email === 1){
+                error = new MyCustomError('Email already exists. Pls log in!', 409);
         }
 
-        return handleErrorMessages(res, 'Something went wrong. Registration failed!', error, 500, filePathAndName);
+        // the processName will be appended to -> 'Something went wrong while ';
+        const processName = `regisetering the user!`;
+        return handleErrorMessages(res, error, processName, filePathAndName);
     }
 }
 
 async function login(req, res){
     try{
-
         const {email, password} = req.body;
         const user = await User.findOne({email});
 
         if(!user)
-            return handleErrorMessages(res, 'User not found!', '', 401, filePathAndName);
+            throw new MyCustomError('User not found!', 404);
  
         const isPasswordValid = await comparePassword(password, user.password);
         
         if(!isPasswordValid)
-            return handleErrorMessages(res, 'Invalid password!', '', 401, filePathAndName);
+            throw new MyCustomError('Invalid Password', 401);
 
         // need to check if we already have an active session for this user
         const existingSession = await Session.findOne({userId: email});
@@ -74,8 +74,9 @@ async function login(req, res){
         await session.save();
         return res.json({token, message: doTheyHaveAnExistingActiveSession ? 'Your previously active session has been terminated. You are logged in here now!' : 'You are logged in.'});
     }
-    catch(error){     
-        return handleErrorMessages(res, 'an error occured while logging in ', error, 500, filePathAndName);    
+    catch(error){
+        const processName = `logging in the user!`;
+        return handleErrorMessages(res, error, processName, filePathAndName);    
     }
 }
 
@@ -86,7 +87,8 @@ async function logout(req, res){
         return res.status(201).json({message: 'Logout Successfull !'});
     }
     catch(error){
-        return handleErrorMessages(res, 'Logout Unsuccessfull.', error, 500, filePathAndName);
+        const processName = `logging out the user!`;
+        return handleErrorMessages(res, error, processName, filePathAndName);
     }
 }
 
@@ -110,7 +112,8 @@ async function verifyCaptcha(req, res){
             return res.status(200).json({captcha_success : data.success});
         })
         .catch(error => {
-            return handleErrorMessages(res, 'Error during verifying captcha', error, 500, filePathAndName);
+            const processName = `verifying the captcha!`;
+            return handleErrorMessages(res, error, processName, filePathAndName);
         });
 }
 
