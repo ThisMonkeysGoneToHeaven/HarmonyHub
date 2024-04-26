@@ -1,7 +1,5 @@
 # HarmonyHub
 
-## RESOLVE SPECIFIC/GENERAL ERROR HANDLING .. ISSUE
-
 ### Things to add
 Spotify O-Auth Workflow Diagram <br>
 Class Diagrams for the backend models <br>
