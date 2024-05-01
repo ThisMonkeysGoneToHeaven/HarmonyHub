@@ -1,11 +1,13 @@
-const crypto = require('crypto');
-const User = require('../models/User');
-const nodemailer = require('nodemailer');
-const {hashPassword} = require('../utils/passwordHash');
-const MyCustomError = require('../utils/MyCustomError');
-const handleErrorMessages = require('../utils/errorHandler');
-const ResetPasswordToken = require('../models/ResetPasswordToken');
-const {isValidEmail, isValidPassword} = require('../utils/basicValidation');
+import crypto from 'crypto';
+import {Request, Response} from 'express';
+import User from '../models/User';
+import nodemailer from 'nodemailer';
+import {hashPassword} from '../utils/passwordHash';
+import MyCustomError from '../utils/MyCustomError';
+import handleErrorMessages from '../utils/errorHandler';
+import ResetPasswordToken from '../models/ResetPasswordToken';
+import { UserRequiredInRequest } from '../utils/defintitionFile';
+import {isValidEmail, isValidPassword} from '../utils/basicValidation';
 
 const resetPasswordTimeoutDurationInMinutes = 5;
 const filePathAndName = 'backend/controllers/userController.js';
@@ -15,7 +17,7 @@ const getRandomToken = () => {
     return randomBytes.toString('hex');
 }
 
-const sendEmail = async (email, link) => {
+const sendEmail = async (email: string, link: string) => {
 
     const transporter = nodemailer.createTransport({
         host: 'smtp.mail.yahoo.com',
@@ -37,13 +39,17 @@ const sendEmail = async (email, link) => {
     return info;
 };
 
-const getUserDetails = async function(req, res){
+export const getUserDetails = async function(req: UserRequiredInRequest, res: Response){
 
     try{
+
+        if(!req.user)
+            throw new Error(`user property is null in request`);
+
         //the userId whose data user wants to see
-        const requestedUsersId = req.params.userId; 
+        const requestedUsersId = req.params.userId.toLowerCase(); 
         //the userId of currently logged in user - obtain this from token
-        const requestingUsersId = req.user.userId;
+        const requestingUsersId = req.user.userId.toLowerCase();
 
         //check if the data they're requesting is their own data or someone else's and respond accordingly 
         if(requestedUsersId !== requestingUsersId)           
@@ -53,21 +59,21 @@ const getUserDetails = async function(req, res){
         
         const userDetails = {
             username: 'MyDude',
-            email: user.email,
-            isSpotifyConnected: user.isSpotifyConnected || false
+            email: user?.email ?? '',
+            isSpotifyConnected: user?.isSpotifyConnected || false
         };
 
-        res.status(200).json(userDetails);
+        return res.status(200).json(userDetails);
     }
-    catch(error){
+    catch(error: any){
         const processName = `fetching user's details!`;
         return handleErrorMessages(res, error, processName, filePathAndName);
     }
 };
 
-async function forgotPassword(req, res){
+export async function forgotPassword(req: Request, res: Response){
     try{
-        const {email} = req.body;
+        const email = req.body.email.toLowerCase();
         const success_message = 'Pls check your email for the reset link.';
         
         if(!isValidEmail(email))
@@ -114,16 +120,18 @@ async function forgotPassword(req, res){
     
         return res.status(200).json({message: 'A reset link has been sent to your email address!'});
     }
-    catch(error){
+    catch(error: any){
         const processName = `processing your forgetPassword request!`;
         return handleErrorMessages(res, error, processName, filePathAndName);
     }
 }
 
-const resetPassword = async function (req, res){
+export const resetPassword = async function (req: Request, res: Response){
     try{
 
-        const {email, token, password} = req.body;
+        const {email_received, token, password} = req.body;
+        const email = email_received.toLowerCase();
+        
         if(!isValidEmail(email))
             throw new MyCustomError('Invalid email. Pls enter a valid email!', 400);
     
@@ -132,6 +140,10 @@ const resetPassword = async function (req, res){
             // invalid unauthorized request since no token is raised for this email
             throw new MyCustomError('Invalid unauthorized request! No reset password token raised for this email account!', 401);
         }
+
+        // validate the fucking token here dude, you forgot to this DO THIS:
+        if(existingResetToken.token !== token)
+            throw new MyCustomError('Invalid token. UNAUTHORIZED!', 401);
     
         const expiryTime = existingResetToken.createdAt + resetPasswordTimeoutDurationInMinutes * 60 * 1000;
         if(Date.now() > expiryTime){
@@ -143,15 +155,17 @@ const resetPassword = async function (req, res){
     
         const hashedPassword = await hashPassword(password);
         const user = await User.findOne({email});
+
+        if(!user)
+            throw new Error('user data found null');
+
         user.password = hashedPassword;
         await user.save();
         
         return res.status(200).json({message: 'Password successfully updated!'});    
     }
-    catch(error){
+    catch(error: any){
         const processName = `changing password!`;
         return handleErrorMessages(res, error, processName, filePathAndName); 
     }
 }
-
-module.exports = {getUserDetails, forgotPassword, resetPassword};

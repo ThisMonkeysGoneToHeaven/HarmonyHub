@@ -1,31 +1,35 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const Session = require('../models/Session');
-const MyCustomError = require('../utils/MyCustomError');
-const handleErrorMessages = require('../utils/errorHandler');
-const {hashPassword, comparePassword} = require('../utils/passwordHash');
-const {isValidEmail, isValidPassword} = require('../utils/basicValidation');
+import express from 'express';
+import jwt from 'jsonwebtoken';
+import User from '../models/User';
+import Session from '../models/Session';
+import MyCustomError from '../utils/MyCustomError';
+import handleErrorMessages from '../utils/errorHandler';
+import { UserRequiredInRequest } from '../utils/defintitionFile';
+import {hashPassword, comparePassword} from '../utils/passwordHash';
+import {isValidEmail, isValidPassword} from '../utils/basicValidation';
 
 // Import the database connection from db.js
-const db = require('../db'); 
-const filePathAndName = 'backend/controllers/authController.js';
+const db = require('../db');
+ 
+const filePathAndName = 'backend/controllers/authController.ts';
 
-async function register(req, res){
+export async function register(req: express.Request, res: express.Response){
     try{
 
-        const {email, password} = req.body;
+        const email = req.body.email.toLowerCase();
+        const password = req.body.password;
+
         if(!isValidEmail(email) || !isValidPassword(password)){
             throw new MyCustomError('Registration failed! Invalid Email or Password!', 400);
         }
 
         const hashedPassword = await hashPassword(password);
-        const newUser = new User({email: email, password: hashedPassword, isSpotifyConnected: false});
+        const newUser = new User({email: email.toLowerCase(), password: hashedPassword, isSpotifyConnected: false});
 
         await newUser.save();
         return res.status(201).json({message: 'Registration successful.'});
     }
-    catch(error){
-
+    catch(error: any){
         if(error.code === 11000 && error.keyPattern.email === 1){
                 error = new MyCustomError('Email already exists. Pls log in!', 409);
         }
@@ -36,9 +40,12 @@ async function register(req, res){
     }
 }
 
-async function login(req, res){
+export async function login(req: express.Request, res: express.Response){
     try{
-        const {email, password} = req.body;
+        
+        const email = req.body.email.toLowerCase();
+        const password = req.body.password;
+
         const user = await User.findOne({email});
 
         if(!user)
@@ -51,10 +58,11 @@ async function login(req, res){
 
         // need to check if we already have an active session for this user
         const existingSession = await Session.findOne({userId: email});
+
         let doTheyHaveAnExistingActiveSession = false;
 
         if(existingSession){
-                if(existingSession.expiresAt > new Date())
+                if(existingSession.expiresAt! > new Date())
                     doTheyHaveAnExistingActiveSession = true;
                 // if a previous session exists, we get rid of that
                 await existingSession.deleteOne();
@@ -62,8 +70,7 @@ async function login(req, res){
 
         // generate a token
         const myUser = {userId: email};
-        const secret_key = process.env.JWT_SECRET_KEY;
-        const token = jwt.sign(myUser, secret_key, {expiresIn: '1h'});
+        const token = jwt.sign(myUser, process.env.JWT_SECRET_KEY!, {expiresIn: '1h'});
 
         const session = new Session({
             userId: email,
@@ -74,25 +81,29 @@ async function login(req, res){
         await session.save();
         return res.json({token, message: doTheyHaveAnExistingActiveSession ? 'Your previously active session has been terminated. You are logged in here now!' : 'You are logged in.'});
     }
-    catch(error){
+    catch(error: any){
         const processName = `logging in the user!`;
         return handleErrorMessages(res, error, processName, filePathAndName);    
     }
 }
 
-async function logout(req, res){
+export async function logout(req: UserRequiredInRequest, res: express.Response){
     try{
-        const {userId} = req.user;
+
+        if(!req.user?.userId)
+            throw new Error('user-id is undefined!');
+
+        const userId = req.user.userId.toLowerCase();
         await Session.deleteMany({userId});
         return res.status(201).json({message: 'Logout Successfull !'});
     }
-    catch(error){
+    catch(error: any){
         const processName = `logging out the user!`;
         return handleErrorMessages(res, error, processName, filePathAndName);
     }
 }
 
-async function verifyCaptcha(req, res){
+export async function verifyCaptcha(req: express.Request, res: express.Response){
         const {token} = req.body;
         const apiUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`;
 
@@ -116,6 +127,3 @@ async function verifyCaptcha(req, res){
             return handleErrorMessages(res, error, processName, filePathAndName);
         });
 }
-
-
-module.exports = {register, login, logout, verifyCaptcha};

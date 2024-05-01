@@ -1,8 +1,10 @@
-const express = require('express');
-const authRouter = require('./routes/authRouter');
-const spotifyRouter = require('./routes/spotifyRouter');
-const userRouter = require('./routes/userRouter');
-require('dotenv').config();
+import express from 'express';
+import authRouter from './routes/authRouter';
+import spotifyRouter from './routes/spotifyRouter';
+import userRouter from './routes/userRouter';
+import { config } from 'dotenv';
+
+config();
 
 const app = express();
 const port = process.env.PORT || 3000;

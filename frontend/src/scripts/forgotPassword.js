@@ -11,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function(){
 
     document.getElementById('forgotPasswordButton').addEventListener('click', function(){
         
-        const email = document.getElementById('forgotPasswordEmail').value;
+        const email = document.getElementById('forgotPasswordEmail').value.toLowerCase();
         const messageBox = document.getElementById('message');
 
         if(!isEmailValid(email)){
@@ -47,6 +47,8 @@ document.addEventListener('DOMContentLoaded', function(){
         .then(response => {
             // success, reset link sent to your email if it exists in our db
             // failure, something went wrong
+            // DO THIS
+            
         });
 
     });

@@ -1,4 +1,17 @@
-const mongoose = require('mongoose');
+import mongoose = require('mongoose');
+
+interface UserInterface{
+    email: string,
+    password: string,
+    isSpotifyConnected: Boolean,
+    spotifyData?: {
+        access_token: string,
+        refresh_token: string,
+        expires_in: Number,
+        expiry_time:Number
+    }    
+}
+
 
 const userSchema = new mongoose.Schema({
     email: {
@@ -19,24 +32,27 @@ const userSchema = new mongoose.Schema({
         type: {
             access_token:{
                 type: String,
-                required: this.isSpotifyConnected ? true : undefined
+                required: true
             },
             refresh_token:{
                 type: String,
-                required: this.isSpotifyConnected ? true : undefined
+                required: true
             },
             expires_in:{
                 type: Number,
-                required: this.isSpotifyConnected ? true : undefined
+                required: true
             },
             expiry_time:{
                 type: Number,
-                required: this.isSpotifyConnected ? true : undefined
+                required: true
             }
         },
-        default : {}
+        required: function(this: UserInterface){
+            return this.isSpotifyConnected;
+        },
+        default: undefined
     }
 });
 
 const User = mongoose.model('User', userSchema);
-module.exports = User;
+export default User;

@@ -1,4 +1,4 @@
-import {loginUser} from "../controllers/authController.mjs";
+import {loginUser, registerUser} from "../controllers/authController.mjs";
 import showMessage from "../utils/showMessage.mjs";
 import {isEmailValid, isPasswordValid} from '../utils/basicValidation.mjs';
 
@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", function(){
     document.getElementById("loginForm").addEventListener("submit", function (event) {
         event.preventDefault(); // Prevent the form from submitting via HTML
 
-        const email = document.getElementById("email").value;
+        const email = document.getElementById("email").value.toLowerCase();
         const password = document.getElementById("password").value;
         
         // basic validation
@@ -32,12 +32,46 @@ document.addEventListener("DOMContentLoaded", function(){
         }
         catch(error){
             console.error(error);
-            showMessage("An error occurred. Please try again later.", "error");
+            showMessage("An error occurred while logging in. Please try again later.");
         }        
 
     });
 
     document.getElementById('forgotPassword').addEventListener('click', function(){
         window.location.href = '../../../frontend/forgotPassword.html';
+    });
+
+    document,this.getElementById('registerForm').addEventListener('submit', function(event){
+        event.preventDefault();
+
+        const email = document.getElementById('register-email').value.toLowerCase();
+        const password = document.getElementById('register-password').value;
+        const confirmPassword = document.getElementById('register-confirm-password').value;
+
+        if(password !== confirmPassword){
+            showMessage('Passwords don\'t match!');
+            return;
+        }
+
+        // basic validation
+        if(!isEmailValid(email) || !isPasswordValid(password)){
+            showMessage("Please enter valid email and password!");
+            return;
+        }
+        
+        registerUser(email, password)
+        .then(response => {
+            if(response){
+                showMessage('A link has been sent to your email address. Please check it within next 5 minutes!')
+            }
+            else{
+                showMessage('Something probably went wrong mate :( ');
+            }
+        })
+        .catch(error => {
+            console.error(error);
+            showMessage("An error occurred while registering the user. Please try again!");
+        });
+        
     });
 });

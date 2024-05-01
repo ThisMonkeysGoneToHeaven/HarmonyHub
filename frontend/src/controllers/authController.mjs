@@ -74,3 +74,28 @@ export async function verifyCaptcha(token){
     .then(data => data.captcha_success)
     .catch(error => console.error(error));
 }
+
+export async function registerUser(email, password){
+    const apiUrl = `${backendServerBaseURL}/auth/register`;
+    const requestOptions = {
+        method: "POST",
+        uri: apiUrl,
+        json: true,
+        headers:{
+            'Content-Type':'application/json'
+        },
+        body: JSON.stringify({email, password}),
+    };
+
+    return fetch(apiUrl, requestOptions)
+        .then(response => {
+            if(!response.ok)
+                throw new Error('Network response was not ok while registering the user!!');
+            return response.json();
+        })
+        .then(data => {
+            return data;
+        })
+        .catch(error => console.error(error));
+
+}

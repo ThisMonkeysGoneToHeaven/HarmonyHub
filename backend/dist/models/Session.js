@@ -1,5 +1,6 @@
-const mongoose = require('mongoose');
-
+"use strict";
+Object.defineProperty(exports, "__esModule", { value: true });
+const mongoose = require("mongoose");
 const sessionSchema = new mongoose.Schema({
     userId: {
         type: String,
@@ -17,6 +18,5 @@ const sessionSchema = new mongoose.Schema({
         type: Date
     }
 });
-
 const Session = mongoose.model('Session', sessionSchema);
-module.exports = Session;
+exports.default = Session;

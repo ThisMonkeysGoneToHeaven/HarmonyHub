@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+import mongoose = require('mongoose');
 
 const tokenSchema = new mongoose.Schema({
     email: {
@@ -16,6 +16,5 @@ const tokenSchema = new mongoose.Schema({
 });
 
 const ResetPasswordToken = mongoose.model('ResetPasswordToken', tokenSchema);
-module.exports = ResetPasswordToken;
-
+export default ResetPasswordToken;
 // An email which does not exist in the user's db, should never be allowed here!
