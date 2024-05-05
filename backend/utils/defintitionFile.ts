@@ -8,3 +8,6 @@ export interface NewTokensReturnType{
   newAccessToken: string,
   newRefreshToken: string
 }
+
+export const resetPasswordTimeoutDurationInMinutes = 5;
+export const registerationTimeoutDurationInMinutes = 5;

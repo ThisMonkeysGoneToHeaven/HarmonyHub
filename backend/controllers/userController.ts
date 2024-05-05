@@ -1,43 +1,16 @@
-import crypto from 'crypto';
-import {Request, Response} from 'express';
 import User from '../models/User';
-import nodemailer from 'nodemailer';
+import {Request, Response} from 'express';
+import sendEmail from '../utils/sendEmail';
 import {hashPassword} from '../utils/passwordHash';
 import MyCustomError from '../utils/MyCustomError';
+import getRandomToken from '../utils/randomTokenGen';
 import handleErrorMessages from '../utils/errorHandler';
 import ResetPasswordToken from '../models/ResetPasswordToken';
-import { UserRequiredInRequest } from '../utils/defintitionFile';
 import {isValidEmail, isValidPassword} from '../utils/basicValidation';
+import { UserRequiredInRequest, registerationTimeoutDurationInMinutes, resetPasswordTimeoutDurationInMinutes} from '../utils/defintitionFile';
+import RegisterationSession from '../models/RegisterationSession';
 
-const resetPasswordTimeoutDurationInMinutes = 5;
 const filePathAndName = 'backend/controllers/userController.js';
-
-const getRandomToken = () => {
-    const randomBytes = crypto.randomBytes(32);
-    return randomBytes.toString('hex');
-}
-
-const sendEmail = async (email: string, link: string) => {
-
-    const transporter = nodemailer.createTransport({
-        host: 'smtp.mail.yahoo.com',
-        port: 465,
-        secure: true, // Use SSL for secure connection
-        auth: {
-          user: process.env.YAHOO_EMAIL,
-          pass: process.env.YAHOO_PASSWORD
-        }
-      });
-
-    const info = await transporter.sendMail({
-        from: process.env.YAHOO_EMAIL,
-        to: 'anantdiagarwal@gmail.com',
-        subject: 'Click the link to reset HarmonyHub Password!',
-        text: link,
-    });
-
-    return info;
-};
 
 export const getUserDetails = async function(req: UserRequiredInRequest, res: Response){
 
@@ -108,8 +81,9 @@ export async function forgotPassword(req: Request, res: Response){
         });
             
         const link = process.env.RESET_PASSWORD_URI + `?userId=${email}&token=${newToken.token}`;
-    
-        await sendEmail(email, link)
+        const subject = `Click the link to reset HarmonyHub Password!`;
+
+        await sendEmail(email, link, subject)
         .then(async response =>  {
             // token must only be saved in the db when the email is successfully sent
             await newToken.save();
@@ -141,7 +115,7 @@ export const resetPassword = async function (req: Request, res: Response){
             throw new MyCustomError('Invalid unauthorized request! No reset password token raised for this email account!', 401);
         }
 
-        // validate the fucking token here dude, you forgot to this DO THIS:
+        // validate the token here my dude
         if(existingResetToken.token !== token)
             throw new MyCustomError('Invalid token. UNAUTHORIZED!', 401);
     
@@ -167,5 +141,37 @@ export const resetPassword = async function (req: Request, res: Response){
     catch(error: any){
         const processName = `changing password!`;
         return handleErrorMessages(res, error, processName, filePathAndName); 
+    }
+}
+
+export async function completeRegisteration(req: Request, res: Response){
+    try{
+        // get email and token from the request
+        const {email, token} = req.body;
+        // check if a reg-session is available for email or throw error o/w
+        const regSession = await RegisterationSession.findOne({email});
+
+        if(!regSession)
+            throw new MyCustomError('No registeration request raised for this user!', 404);
+        // check if the reg-session is not expired or throw error o/w
+        if(Date.now() > regSession.expiry_time)
+            throw new MyCustomError(`Registeration request expired. Pls re-start the registeration process again and make sure to verify your email within ${registerationTimeoutDurationInMinutes} minutes!`, 408);
+        // check if the token is valid or throw error o/w
+        if(token !== regSession.token)
+            throw new MyCustomError('Invalid Token! Token must not be tampered with.', 401);
+        // make a new User object for this request
+        const newUser = new User({
+            email: email,
+            password: regSession.password,
+            isSpotifyConnected: false
+        });
+        // save it to the db
+        await newUser.save();
+        // send success
+        return res.status(200).json({message: 'Successfully registered user. Pls login in with your credentials!'});
+    }
+    catch(error: any){
+        const processName = `completing user registeration!`;
+        return handleErrorMessages(res, error, processName, filePathAndName);
     }
 }

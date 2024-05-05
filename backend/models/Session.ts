@@ -3,7 +3,8 @@ import mongoose = require('mongoose');
 const sessionSchema = new mongoose.Schema({
     userId: {
         type: String,
-        required: true
+        required: true,
+        unique: true
     },
     token: {
         type: String,

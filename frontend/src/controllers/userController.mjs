@@ -39,7 +39,7 @@ export async function forgotPassword(email){
 
     return fetch(apiUrl, requestOptions)
     .then(response => response.json())
-    .then(data => console.log(data))
+    .then(data => data)
     .catch(error => console.error(error));
 }
 
@@ -56,6 +56,23 @@ export async function resetPassword(email, token, password){
 
     return fetch(apiUrl, requestOptions)
     .then(response => response.json())
-    .then(data => console.log(data))
+    .then(data => data)
+    .catch(error => console.error(error));
+}
+
+export async function registerationCompletion(email, token){
+
+    const apiUrl = `${backendServerBaseURL}/api/user/completeRegisteration`;
+    const requestOptions = {
+        method: 'POST',
+        body: JSON.stringify({email, token}),
+        headers:{
+            'Content-Type': 'application/json'
+        }
+    }
+
+    return fetch(apiUrl, requestOptions)
+    .then(response => response.json())
+    .then(data => data)
     .catch(error => console.error(error));
 }

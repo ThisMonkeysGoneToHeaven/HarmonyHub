@@ -1,19 +1,22 @@
-import express from 'express';
 import jwt from 'jsonwebtoken';
 import User from '../models/User';
 import Session from '../models/Session';
+import {Request, Response} from 'express';
 import MyCustomError from '../utils/MyCustomError';
+import getRandomToken from '../utils/randomTokenGen';
 import handleErrorMessages from '../utils/errorHandler';
-import { UserRequiredInRequest } from '../utils/defintitionFile';
+import { UserRequiredInRequest, registerationTimeoutDurationInMinutes } from '../utils/defintitionFile';
 import {hashPassword, comparePassword} from '../utils/passwordHash';
 import {isValidEmail, isValidPassword} from '../utils/basicValidation';
+import RegisterationSession from '../models/RegisterationSession';
+import sendEmail from '../utils/sendEmail';
 
 // Import the database connection from db.js
 const db = require('../db');
  
 const filePathAndName = 'backend/controllers/authController.ts';
 
-export async function register(req: express.Request, res: express.Response){
+export async function register(req: Request, res: Response){
     try{
 
         const email = req.body.email.toLowerCase();
@@ -24,23 +27,48 @@ export async function register(req: express.Request, res: express.Response){
         }
 
         const hashedPassword = await hashPassword(password);
-        const newUser = new User({email: email.toLowerCase(), password: hashedPassword, isSpotifyConnected: false});
 
-        await newUser.save();
-        return res.status(201).json({message: 'Registration successful.'});
+        // generate a token
+        const token = getRandomToken();
+        // create an object for storing registeration-sessions and add the token, email and password to the schema with 5-10 mins validity
+        const registerationSessionUser = new RegisterationSession({
+            email: email,
+            password: hashedPassword,
+            token: token,
+            expiry_time: Date.now() + registerationTimeoutDurationInMinutes * 60 * 1000
+        });
+
+        // send the email with token
+        const link = process.env.REGISTERATION_ACTIVATION_URI + `?userId=${email}&token=${token}`;
+        const subject = `Click this link to activate your HarmonyHub account!`;
+
+        // IF EMAIL SENT SUCCESFULLY : save the entry in the db
+        sendEmail(email, link, subject)
+        .then(async response => {
+            // check if a sessionRequest already exists and delete it 
+            const existingSessionCheck = await RegisterationSession.findOne({email});
+            if(existingSessionCheck)
+                await existingSessionCheck.deleteOne();
+            // otherwise make a new one
+            await registerationSessionUser.save();
+        })
+        .catch(error => {
+            throw new MyCustomError('Something went wrong while sending the email', 500);
+        });
+
+        return res.status(201).json({message: `Pls click on the link sent to your email address within next ${registerationTimeoutDurationInMinutes} minutes to activate your HarmonyHub account!`});
     }
     catch(error: any){
         if(error.code === 11000 && error.keyPattern.email === 1){
                 error = new MyCustomError('Email already exists. Pls log in!', 409);
         }
 
-        // the processName will be appended to -> 'Something went wrong while ';
         const processName = `regisetering the user!`;
         return handleErrorMessages(res, error, processName, filePathAndName);
     }
 }
 
-export async function login(req: express.Request, res: express.Response){
+export async function login(req: Request, res: Response){
     try{
         
         const email = req.body.email.toLowerCase();
@@ -87,7 +115,7 @@ export async function login(req: express.Request, res: express.Response){
     }
 }
 
-export async function logout(req: UserRequiredInRequest, res: express.Response){
+export async function logout(req: UserRequiredInRequest, res: Response){
     try{
 
         if(!req.user?.userId)
@@ -103,7 +131,7 @@ export async function logout(req: UserRequiredInRequest, res: express.Response){
     }
 }
 
-export async function verifyCaptcha(req: express.Request, res: express.Response){
+export async function verifyCaptcha(req: Request, res: Response){
         const {token} = req.body;
         const apiUrl = `https://www.google.com/recaptcha/api/siteverify?secret=${process.env.RECAPTCHA_SECRET_KEY}&response=${token}`;
 

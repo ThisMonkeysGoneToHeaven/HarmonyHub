@@ -14,5 +14,7 @@ export default function handleErrorMessages(res: express.Response, error: Error,
 
 function logErrorMessages(error_mssg: string, filePathAndName: string, caught_error: object): void{
     const error_log = `${filePathAndName} ----->  ` + error_mssg;
-    console.error(error_log + (caught_error ? ' : ' + caught_error : ``));
+    console.error(error_log);
+    if(caught_error && Object.keys(caught_error).length > 0)
+        console.error(caught_error);
 }

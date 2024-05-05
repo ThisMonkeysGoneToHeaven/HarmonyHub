@@ -24,7 +24,6 @@ document.addEventListener("DOMContentLoaded", function(){
             return;
         }
 
-        // send the password to the backend
         resetPassword(email, token, password)
         .then(response => {
             // handle reset password success or failure :)
