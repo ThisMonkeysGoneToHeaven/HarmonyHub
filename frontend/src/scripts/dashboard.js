@@ -24,9 +24,24 @@ document.addEventListener("DOMContentLoaded", function(){
                 welcomeElement.innerHTML = `<h3>Welcome to HarmonyHub, ${response.email}</h3>`;
 
                 if(response.isSpotifyConnected){
-                    const spotifyData = document.getElementById('spotifyData');
+                    const artistContainer = document.getElementById('artistContainer');
                     const usersTopArtists = await fetchUsersTopArtists(token);
-                    console.log(usersTopArtists);
+                    usersTopArtists.items.forEach(artist => {
+
+                        const artistElement = document.createElement('div');
+                        artistElement.className = 'artist';
+
+                        const artistImage = document.createElement('img');
+                        artistImage.className = 'artistImage';
+                        artistImage.src = artist.images[0].url;            
+
+                        const artistName = document.createElement('h2');
+                        artistName.textContent = artist.name;
+
+                        artistElement.appendChild(artistName);
+                        artistElement.appendChild(artistImage);
+                        artistContainer.appendChild(artistElement);
+                    });
                     disconnectSpotifyButton.innerHTML = `<button>Disconnect Spotify</button>`;
                 } 
                 else{
