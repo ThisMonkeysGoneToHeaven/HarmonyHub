@@ -7,10 +7,15 @@ Session Management for HH <br>
 Sample .env file <br>
 
 ### Things to do before deployment
-SSL is implemented properly<br>
 db.js uses .env<br>
-ayush's css code is merged<br>
 should authenticateUser make a db call, logout from client and send a request through postman to see if they go through or not<br>
-GetTopArtists HTML is implemented and they are displayed on the dashboard<br>
-Make sure that APIs follow REST norms<br>
 New Yahoo Email with name HarmonyHub
+SSL is implemented properly<br>
+ayush's css code is merged<br>
+
+### Plans
+Deploy on AWS on a simple EC2 instance <br>
+Eventually play around with interesting System Designs <br>
+Google Gemini para generate making fun of user's music taste <br>
+Think about followers and following and how it's going to be implemented <br>
+Think about how will the feed of common artist be generated <br>
