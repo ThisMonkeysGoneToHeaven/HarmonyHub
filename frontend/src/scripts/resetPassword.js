@@ -24,9 +24,15 @@ document.addEventListener("DOMContentLoaded", function(){
             return;
         }
 
+
         resetPassword(email, token, password)
-        .then(response => {
-            // handle reset password success or failure :)
+        .then(data => {
+            if(data.message)
+                showMessage(data.message);
+            else if(data.error)
+                showMessage(data.error)
+            else
+                showMessage(`Something went wrong. Pls try again later!`);
         });
     });
 });

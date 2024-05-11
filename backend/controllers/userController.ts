@@ -103,8 +103,8 @@ export async function forgotPassword(req: Request, res: Response){
 export const resetPassword = async function (req: Request, res: Response){
     try{
 
-        const {email_received, token, password} = req.body;
-        const email = email_received.toLowerCase();
+        let {email, token, password} = req.body;
+        email = email.toLowerCase();
         
         if(!isValidEmail(email))
             throw new MyCustomError('Invalid email. Pls enter a valid email!', 400);

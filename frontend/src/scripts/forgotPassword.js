@@ -29,8 +29,9 @@ document.addEventListener('DOMContentLoaded', function(){
                 const isCaptchaValid = verifyCaptcha(token);
 
                 if(isCaptchaValid === undefined){
-                    console.error('error while verifying captcha');
-                    showMessage('error while verifying captcha');
+                    const captchaErrorMssg = 'error while verifying captcha';
+                    console.error(captchaErrorMssg);
+                    showMessage(captchaErrorMssg);
                     return;
                 }
 
@@ -38,17 +39,17 @@ document.addEventListener('DOMContentLoaded', function(){
                     showMessage('captcha failed - suspicious activity detected, pls try again later!');
                     return;
                 }
-
-                console.log('captcha valid!');
             });
         });
 
         forgotPassword(email)
-        .then(response => {
-            // success, reset link sent to your email if it exists in our db
-            // failure, something went wrong
-            // DO THIS
-            
+        .then(data => {
+            if(data.message)
+                showMessage(data.message);
+            else if(data.error)
+                showMessage(data.error)
+            else
+                showMessage(`Something went wrong. Pls try again later!`);
         });
 
     });
