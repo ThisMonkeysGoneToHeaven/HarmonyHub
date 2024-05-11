@@ -1,6 +1,10 @@
 # typescript dist files
 dist/
 
+# ssl keys
+
+cert/
+
 # Dependency directory
 node_modules/
 
