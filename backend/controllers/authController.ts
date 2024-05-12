@@ -90,7 +90,7 @@ export async function login(req: Request, res: Response){
         let doTheyHaveAnExistingActiveSession = false;
 
         if(existingSession){
-                if(existingSession.expiresAt! > new Date())
+                if(existingSession.expiresAt! > Date.now())
                     doTheyHaveAnExistingActiveSession = true;
                 // if a previous session exists, we get rid of that
                 await existingSession.deleteOne();
@@ -103,7 +103,7 @@ export async function login(req: Request, res: Response){
         const session = new Session({
             userId: email,
             token,
-            expiresAt: new Date(Date.now() + 60 * 60 * 1000)
+            expiresAt: Date.now() + 60 * 60 * 1000
         });
 
         await session.save();

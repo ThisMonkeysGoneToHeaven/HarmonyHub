@@ -11,11 +11,11 @@ const sessionSchema = new mongoose.Schema({
         required: true
     },
     createdAt: {
-        type: Date,
+        type: Number,
         default: Date.now
     },
     expiresAt: {
-        type: Date
+        type: Number
     }
 });
 

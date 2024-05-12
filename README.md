@@ -8,7 +8,6 @@ Sample .env file <br>
 
 ### Things to do before deployment
 db.js uses .env<br>
-should authenticateUser make a db call, logout from client and send a request through postman to see if they go through or not<br>
 New Yahoo Email with name HarmonyHub
 SSL is implemented properly<br>
 ayush's css code is merged<br>
