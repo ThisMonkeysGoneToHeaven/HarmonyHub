@@ -11,9 +11,7 @@ import {isValidEmail, isValidPassword} from '../utils/basicValidation';
 import RegisterationSession from '../models/RegisterationSession';
 import sendEmail from '../utils/sendEmail';
 
-// Import the database connection from db.js
-const db = require('../db');
- 
+
 const filePathAndName = 'backend/controllers/authController.ts';
 
 export async function register(req: Request, res: Response){

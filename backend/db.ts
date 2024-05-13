@@ -1,8 +1,6 @@
 import mongoose,{ConnectOptions} from 'mongoose';
 
-// DO THIS
-// const uri = process.env.DB_SERVER_PATH;
-const uri = `mongodb://localhost:27017/HarmonyHub`;
+const uri = process.env.DB_SERVER_PATH!;
 
 mongoose.connect(uri, {
   useNewUrlParser: true,

@@ -8,9 +8,14 @@ import spotifyRouter from './routes/spotifyRouter';
 
 config();
 
+// Import the database connection from db.js
+const db = require('./db');
+
 const app = express();
 const port = process.env.PORT || 3000;
 
+
+// self signed certificate credentials
 const privateKey = fs.readFileSync('./cert/key.pem', 'utf8');
 const certificate = fs.readFileSync('./cert/cert.pem', 'utf8');
 

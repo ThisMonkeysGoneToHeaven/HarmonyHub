@@ -4,14 +4,13 @@
 
 Spotify O-Auth Workflow Diagram <br>
 Class Diagrams for the backend models <br>
-Session Management for HH <br>
+Session Management Diagram for HH <br>
 Sample .env file <br>
 
 ### Things to do before deployment
 
-db.js uses .env<br>
-New Yahoo Email with name HarmonyHub
 SSL is implemented properly<br>
+New Yahoo Email with name HarmonyHub<br>
 
 ### Plans
 
