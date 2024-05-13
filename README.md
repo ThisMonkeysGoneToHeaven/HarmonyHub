@@ -19,3 +19,4 @@ Eventually play around with interesting System Designs <br>
 Google Gemini para generate making fun of user's music taste <br>
 Think about followers and following and how it's going to be implemented <br>
 Think about how will the feed of common artist be generated <br>
+Spotify Accounts should be unique for all users <br>
