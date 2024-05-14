@@ -1,3 +1,5 @@
-const backendServerBaseURL = 'https://localhost:3000';
+const serverIp = `localhost`;
+const PORT = 3000;
+const backendServerBaseURL = `https://${serverIp}:${PORT}`;
 
 export {backendServerBaseURL};

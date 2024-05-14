@@ -1,14 +1,15 @@
+import { config } from 'dotenv';
+config();
+
 const fs = require('fs');
 import express from 'express';
 const https = require('https');
-import { config } from 'dotenv';
 import authRouter from './routes/authRouter';
 import userRouter from './routes/userRouter';
 import spotifyRouter from './routes/spotifyRouter';
 
-config();
 
-// Import the database connection from db.js
+// Import the database connection from db.ts
 const db = require('./db');
 
 const app = express();
