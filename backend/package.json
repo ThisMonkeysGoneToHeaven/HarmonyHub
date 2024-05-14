@@ -21,6 +21,7 @@
     "nodemailer": "^6.9.13",
     "request": "^2.88.2",
     "request-promise": "^4.2.6",
+    "typescript": "^5.4.5",
     "validator": "^13.11.0"
   },
   "devDependencies": {
