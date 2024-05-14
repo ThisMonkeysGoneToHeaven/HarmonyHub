@@ -36,5 +36,5 @@ app.use('/api/spotify', spotifyRouter);
 app.use('/api/user', userRouter);
 
 app.listen(port, () => {
-    console.log(`Backend is running on ${port}`);
+    console.log(`Backend server is running on ${port}`);
 });
