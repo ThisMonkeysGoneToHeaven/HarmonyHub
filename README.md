@@ -9,7 +9,7 @@ Sample .env file <br>
 
 ### Things to do before deployment
 
-SSL is implemented properly<br>
+Setup separate enviroments for prod and dev
 New Yahoo Email with name HarmonyHub<br>
 
 ### Plans
