@@ -9,7 +9,7 @@ Sample .env file <br>
 
 ### Things to do before deployment
 
-Setup separate enviroments for prod and dev
+Setup separate enviroments for prod and dev<br>
 New Yahoo Email with name HarmonyHub<br>
 
 ### Plans
