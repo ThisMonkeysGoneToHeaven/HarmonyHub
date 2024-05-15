@@ -14,9 +14,14 @@ New Yahoo Email with name HarmonyHub<br>
 
 ### Plans
 
-Deploy on AWS on a simple EC2 instance <br>
 Eventually play around with interesting System Designs <br>
+Use decorator pattern to support different caching mechanisms
 Google Gemini para generate making fun of user's music taste <br>
 Think about followers and following and how it's going to be implemented <br>
 Think about how will the feed of common artist be generated <br>
 Spotify Accounts should be unique for all users <br>
+
+### Further Explorations and Improvements
+
+Think about implementing an external rate limiter wherever required. Currently rate limiting email requests sent within five minutes, move this functionality to external limiter. <br>
+Allow user to send more than one emails for activation link or password reset within the specified duration <br>
