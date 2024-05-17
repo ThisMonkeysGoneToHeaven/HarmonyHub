@@ -24,7 +24,7 @@ document.addEventListener("DOMContentLoaded", function(){
                     sessionStorage.setItem("token", response.token);
                     sessionStorage.setItem("user_id", email);
                     // redirect to dashboard - the path here is relative to index.html and not this .js file
-                    window.location.href = '../../../frontend/dashboard.html';
+                    window.location.href = '../../dashboard.html';
                 }
                 else
                     showMessage('Login failed. Please check your credentials.', 'error');
@@ -38,7 +38,7 @@ document.addEventListener("DOMContentLoaded", function(){
     });
 
     document.getElementById('forgotPassword').addEventListener('click', function(){
-        window.location.href = '../../../frontend/forgotPassword.html';
+        window.location.href = '../../forgotPassword.html';
     });
 
     document,this.getElementById('registerForm').addEventListener('submit', function(event){

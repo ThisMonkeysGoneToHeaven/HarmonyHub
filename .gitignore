@@ -19,6 +19,7 @@ package-lock.json
 
 # VS Code settings
 .vscode/settings.json
+frontend/.vscode/
 
 # Cache folders (add more patterns for specific cache directories if needed)
 .npm
