@@ -6,6 +6,6 @@ const serverIp = `harmonyhub-u29y.onrender.com`;
 const protocol = `https`;
 const PORT = 10000;
 
-const backendServerBaseURL = `${protocol}://${serverIp}:${PORT}`;
+const backendServerBaseURL = `${protocol}://${serverIp}${serverIp == `localhost` ? `:3000` : ``}`;
 
 export {backendServerBaseURL};
