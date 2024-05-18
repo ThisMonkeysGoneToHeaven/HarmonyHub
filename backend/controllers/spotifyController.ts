@@ -41,7 +41,8 @@ export const handleCallback = async function(req: express.Request, res: express.
     const state = req.query.state || null;
 
     if(state === null){
-        res.redirect('/#' +
+        console.error('ERROR: state_mismatch!');
+        return res.redirect('/#' +
           querystring.stringify({
             error: 'state_mismatch'
         }));
@@ -67,7 +68,6 @@ export const handleCallback = async function(req: express.Request, res: express.
     .then(response => response.json())
     .then(async data => {
 
-        // DO THIS: why the f do I have to manually check if data is defined or not this should be caught by the system man
         if(data.access_token === undefined)
             throw new MyCustomError('Access token is undefined!', 500);
         
