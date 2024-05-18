@@ -1,5 +1,7 @@
 # HarmonyHub
 
+<br>App is live at https://harmonyhub-1-61up.onrender.com/index.html<br>
+
 ### Things to add
 
 Spotify O-Auth Workflow Diagram <br>
