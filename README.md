@@ -2,6 +2,10 @@
 
 <br>App is live at https://harmonyhub-1-61up.onrender.com/index.html<br>
 
+## Establishing connection with Spotify's O-Auth Protected API
+
+![Spotify - O Auth Workflow](https://github.com/ThisMonkeysGoneToHeaven/HarmonyHub/assets/32913413/bee16dab-4684-4ad0-950a-578caa23a9b3)
+
 ### Things to add
 
 Spotify O-Auth Workflow Diagram <br>
