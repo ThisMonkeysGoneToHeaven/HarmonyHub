@@ -8,7 +8,6 @@
 
 ### Things to add
 
-Spotify O-Auth Workflow Diagram <br>
 Class Diagrams for the backend models <br>
 Session Management Diagram for HH <br>
 Sample .env file <br>
