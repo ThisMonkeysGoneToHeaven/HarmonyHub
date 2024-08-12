@@ -8,14 +8,15 @@
 
 ### Things to add
 
-Class Diagrams for the backend models <br>
-Session Management Diagram for HH <br>
-Sample .env file <br>
+1. Sample .env file <br>
+2. Setup separate enviroments for prod and dev<br>
+3. New Yahoo Email with name HarmonyHub<br>
+4. Spotify Accounts should be unique for all users <br>
+5. Implement Redis Based Caching to store user's spotify data for next 24 hours. Try utilising the CachingDecorator to achieve this. <br>
+6. Provide Spotify-Sign-Up option, along with the currently present email-pass registeration. <br>
 
-### Things to do before deployment
-
-Setup separate enviroments for prod and dev<br>
-New Yahoo Email with name HarmonyHub<br>
+-> Class Diagrams for the backend models <br>
+-> Session Management Diagram for HH <br>
 
 ### Plans
 
@@ -24,7 +25,6 @@ Use decorator pattern to support different caching mechanisms
 Google Gemini para generate making fun of user's music taste <br>
 Think about followers and following and how it's going to be implemented <br>
 Think about how will the feed of common artist be generated <br>
-Spotify Accounts should be unique for all users <br>
 
 ### Further Explorations and Improvements
 
